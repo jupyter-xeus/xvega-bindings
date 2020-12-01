@@ -13,7 +13,6 @@
 #include <map>
 
 #include "nlohmann/json.hpp"
-#include "xeus/xinterpreter.hpp"
 #include "xvega/xvega.hpp"
 
 #include "utils.hpp"

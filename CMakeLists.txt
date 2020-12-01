@@ -18,7 +18,6 @@ set(XV_BINDINGS_CMAKE_PROJECT_TARGETS_FILE "${XV_BINDINGS_CMAKE_CONFIG_DIR}/${PR
 # ============
 find_package(xvega REQUIRED)
 
-
 # Targeting
 # =========
 add_library(${XV_BINDINGS_TARGET_NAME} INTERFACE)
