@@ -6,12 +6,15 @@
 *                                                                          *
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
-
 #include <iostream>
 #include <algorithm>
 #include <vector>
 #include <iterator>
 #include <map>
+
+#include "nlohmann/json.hpp"
+#include "xeus/xinterpreter.hpp"
+#include "xvega/xvega.hpp"
 
 #include "utils.hpp"
 
@@ -412,11 +415,9 @@ namespace xv_bindings
     {
         xv::Chart& chart;
 
-        mark_parser(xv::Chart& chart)
+        mark_parser(xv::Chart& chart) : chart(chart)
         {
-            this->chart = chart;
-            mapping_table =
-            {
+            mapping_table = {
                 {"COLOR", { 1, &mark_parser::parse_color }},
             };
         }
@@ -533,7 +534,7 @@ namespace xv_bindings
         }
     };
 
-    nl::json xv_sqlite::process_xvega_input(std::vector<std::string>
+    static nl::json process_xvega_input(std::vector<std::string>
                                                tokenized_input,
                                                xv::df_type xv_sqlite_df)
     {
