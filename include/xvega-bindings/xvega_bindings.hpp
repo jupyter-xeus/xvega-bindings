@@ -529,7 +529,11 @@ namespace xv_bindings
         void parse_title(const input_it& it)
         {
             std::vector<std::string> v = {*it};
-            this->chart.config().value().header().value().title().value() = v;
+            for (auto a : v){
+                std::cout << a << std::endl;
+                std::cout << "🌈🌈🌈\n";
+            }
+            this->chart.title().value() = v;
         }
     };
 
