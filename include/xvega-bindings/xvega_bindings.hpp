@@ -95,7 +95,7 @@ namespace xv_bindings
             parse_function_types parse_function;
         };
 
-        using free_fun = std::function<void()>;
+        using free_fun = coutfunction<void()>;
 
         std::map<std::string, command_info> mapping_table;
 
@@ -300,8 +300,8 @@ namespace xv_bindings
             {
                 return simple_switch(*begin,
                 {
-                    {"TRUE",  [&]{ x_or_y->bin().value() = true; std::cout << "🌴🌴 Param found should just work\n";}},
-                    {"FALSE", [&]{ x_or_y->bin().value() = false; std::cout << "🌴🌴 Param found should just work\n";}},
+                    {"TRUE",  [&]{ x_or_y->bin().value() = true;  }},
+                    {"FALSE", [&]{ x_or_y->bin().value() = false; }},
                 });
             }, enc);
 
@@ -529,10 +529,6 @@ namespace xv_bindings
         void parse_title(const input_it& it)
         {
             std::vector<std::string> v = {*it};
-            for (auto a : v){
-                std::cout << a << std::endl;
-                std::cout << "🌈🌈🌈\n";
-            }
             this->chart.title().value() = v;
         }
     };
