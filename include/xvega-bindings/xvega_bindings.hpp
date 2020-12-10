@@ -207,9 +207,9 @@ namespace xv_bindings
         {
             return {
                 std::type_index(typeid(U)),
-                [g = f](xtl::any const &a)
+                [=](xtl::any const &a)
                 {
-                    g(xtl::any_cast<U const&>(a));
+                    f(xtl::any_cast<U const&>(a));
                 }
             };
         }
