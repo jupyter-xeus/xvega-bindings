@@ -6,11 +6,19 @@
 *                                                                          *
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
-#include <iostream>
 #include <algorithm>
-#include <vector>
+#include <any>
+#include <functional>
+#include <iomanip>
+#include <iostream>
 #include <iterator>
 #include <map>
+#include <type_traits>
+#include <typeindex>
+#include <typeinfo>
+#include <unordered_map>
+#include <vector>
+#include <utility>
 
 #include "nlohmann/json.hpp"
 #include "xvega/xvega.hpp"
@@ -95,7 +103,7 @@ namespace xv_bindings
             parse_function_types parse_function;
         };
 
-        using free_fun = coutfunction<void()>;
+        using free_fun = std::function<void()>;
 
         std::map<std::string, command_info> mapping_table;
 
@@ -188,6 +196,40 @@ namespace xv_bindings
             }
 
             return it;
+        }
+
+        /* Implementation of a visitor for xv::xany which is a xtl::any */
+        using visitor_map_type = std::unordered_map<std::type_index, std::function<void(xtl::any const&)>>;
+
+        template<typename U, typename F>
+        inline std::pair<const std::type_index, std::function<void(xtl::any const&)> >
+            to_any_visitor(F const &f)
+        {
+            return {
+                std::type_index(typeid(U)),
+                [g = f](xtl::any const &a)
+                {
+                    g(xtl::any_cast<U const&>(a));
+                }
+            };
+        }
+
+        inline void visit_any(const xtl::any& a, const visitor_map_type& any_visitor)
+        {
+            if (const auto it = any_visitor.find(std::type_index(a.type()));
+                it != any_visitor.cend()) {
+                it->second(a);
+            } else {
+                std::cout << "Unregistered type "<< std::quoted(a.type().name());
+            }
+        }
+
+        template<typename U, typename F>
+        inline void register_any_visitor(F const& f, visitor_map_type& any_visitor)
+        {
+            std::cout << "Register visitor for type "
+                      << std::quoted(typeid(U).name()) << '\n';
+            any_visitor.insert(to_any_visitor<U>(f));
         }
     };
 
@@ -446,10 +488,21 @@ namespace xv_bindings
 
         void parse_color(const input_it& it)
         {
-            xtl::visit([&](auto&& mark_generic)
-            {
-                mark_generic.color = to_lower(*it);
-            }, this->chart.mark());
+            visitor_map_type any_visitor {
+                to_any_visitor<xv::mark_arc>    ([&](auto mark_generic) { mark_generic.color = to_lower(*it); }),
+                to_any_visitor<xv::mark_area>   ([&](auto mark_generic) { mark_generic.color = to_lower(*it); }),
+                to_any_visitor<xv::mark_bar>    ([&](auto mark_generic) { mark_generic.color = to_lower(*it); }),
+                to_any_visitor<xv::mark_circle> ([&](auto mark_generic) { mark_generic.color = to_lower(*it); }),
+                to_any_visitor<xv::mark_line>   ([&](auto mark_generic) { mark_generic.color = to_lower(*it); }),
+                to_any_visitor<xv::mark_point>  ([&](auto mark_generic) { mark_generic.color = to_lower(*it); }),
+                to_any_visitor<xv::mark_rect>   ([&](auto mark_generic) { mark_generic.color = to_lower(*it); }),
+                to_any_visitor<xv::mark_rule>   ([&](auto mark_generic) { mark_generic.color = to_lower(*it); }),
+                to_any_visitor<xv::mark_square> ([&](auto mark_generic) { mark_generic.color = to_lower(*it); }),
+                to_any_visitor<xv::mark_tick>   ([&](auto mark_generic) { mark_generic.color = to_lower(*it); }),
+                to_any_visitor<xv::mark_trail>  ([&](auto mark_generic) { mark_generic.color = to_lower(*it); }),
+            };
+
+            visit_any(this->chart.mark(), any_visitor);
         }
     };
 
@@ -529,7 +582,7 @@ namespace xv_bindings
         void parse_title(const input_it& it)
         {
             std::vector<std::string> v = {*it};
-            this->chart.title().value() = v;
+            // this->chart.title().value() = v;
         }
     };
 
@@ -555,9 +608,6 @@ namespace xv_bindings
             throw std::runtime_error("This is not a valid command for SQLite XVega.");
         }
 
-        nl::json bundle;
-        bundle["application/vnd.vegalite.v3+json"] = chart;
-
-        return bundle;
+        return xv::mime_bundle_repr(chart);
     }
 }
