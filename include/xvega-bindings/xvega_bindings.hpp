@@ -6,6 +6,10 @@
 *                                                                          *
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
+
+#ifndef XVEGA_BINDINGS_HPP
+#define XVEGA_BINDINGS_HPP
+
 #include <algorithm>
 #include <any>
 #include <functional>
@@ -611,3 +615,5 @@ namespace xv_bindings
         return xv::mime_bundle_repr(chart);
     }
 }
+
+#endif
