@@ -24,6 +24,8 @@
 #include <vector>
 #include <utility>
 
+#include <cxxabi.h>
+
 #include "nlohmann/json.hpp"
 #include "xvega/xvega.hpp"
 
@@ -33,6 +35,13 @@ namespace nl = nlohmann;
 
 namespace xv_bindings
 {
+    std::string demangle(const char* mangled)
+    {
+          int status;
+          std::unique_ptr<char[], void (*)(void*)> result(
+            __cxxabiv1::__cxa_demangle(mangled, 0, 0, &status), std::free);
+          return result.get() ? std::string(result.get()) : "error occurred";
+    }
     /**
         Base parser class, should be inherited to define concrete parsers. This class
         contains helpers to call appropriate parsing functions based on a parsing map,
@@ -142,6 +151,7 @@ namespace xv_bindings
         input_it parse_step(const input_it& begin, const input_it& end)
         {
             input_it it = begin;
+            std::cout << "🦋 parsing: " << *it << std::endl;
 
             auto cmd_it = mapping_table.find(to_upper(*it));
             if (cmd_it == mapping_table.end())
@@ -224,7 +234,7 @@ namespace xv_bindings
                 it != any_visitor.cend()) {
                 it->second(a);
             } else {
-                std::cout << "Unregistered type "<< std::quoted(a.type().name());
+                std::cout << "Unregistered type "<< std::quoted(demangle(a.type().name()));
             }
         }
 
@@ -493,20 +503,20 @@ namespace xv_bindings
         void parse_color(const input_it& it)
         {
             visitor_map_type any_visitor {
-                to_any_visitor<xv::mark_arc>    ([&](auto mark_generic) { mark_generic.color = to_lower(*it); }),
-                to_any_visitor<xv::mark_area>   ([&](auto mark_generic) { mark_generic.color = to_lower(*it); }),
-                to_any_visitor<xv::mark_bar>    ([&](auto mark_generic) { mark_generic.color = to_lower(*it); }),
-                to_any_visitor<xv::mark_circle> ([&](auto mark_generic) { mark_generic.color = to_lower(*it); }),
-                to_any_visitor<xv::mark_line>   ([&](auto mark_generic) { mark_generic.color = to_lower(*it); }),
-                to_any_visitor<xv::mark_point>  ([&](auto mark_generic) { mark_generic.color = to_lower(*it); }),
-                to_any_visitor<xv::mark_rect>   ([&](auto mark_generic) { mark_generic.color = to_lower(*it); }),
-                to_any_visitor<xv::mark_rule>   ([&](auto mark_generic) { mark_generic.color = to_lower(*it); }),
-                to_any_visitor<xv::mark_square> ([&](auto mark_generic) { mark_generic.color = to_lower(*it); }),
-                to_any_visitor<xv::mark_tick>   ([&](auto mark_generic) { mark_generic.color = to_lower(*it); }),
-                to_any_visitor<xv::mark_trail>  ([&](auto mark_generic) { mark_generic.color = to_lower(*it); }),
+                to_any_visitor<xtl::xclosure_wrapper<xv::mark_arc&>>    ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
+                to_any_visitor<xtl::xclosure_wrapper<xv::mark_area&>>   ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
+                to_any_visitor<xtl::xclosure_wrapper<xv::mark_bar&>>    ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
+                to_any_visitor<xtl::xclosure_wrapper<xv::mark_circle&>> ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
+                to_any_visitor<xtl::xclosure_wrapper<xv::mark_line&>>   ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
+                to_any_visitor<xtl::xclosure_wrapper<xv::mark_point&>>  ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
+                to_any_visitor<xtl::xclosure_wrapper<xv::mark_rect&>>   ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
+                to_any_visitor<xtl::xclosure_wrapper<xv::mark_rule&>>   ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
+                to_any_visitor<xtl::xclosure_wrapper<xv::mark_square&>> ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
+                to_any_visitor<xtl::xclosure_wrapper<xv::mark_tick&>>   ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
+                to_any_visitor<xtl::xclosure_wrapper<xv::mark_trail&>>  ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
             };
 
-            visit_any(this->chart.mark(), any_visitor);
+            visit_any(this->chart.mark().value(), any_visitor);
         }
     };
 
