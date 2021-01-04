@@ -151,7 +151,6 @@ namespace xv_bindings
         input_it parse_step(const input_it& begin, const input_it& end)
         {
             input_it it = begin;
-            std::cout << "🦋 parsing: " << *it << std::endl;
 
             auto cmd_it = mapping_table.find(to_upper(*it));
             if (cmd_it == mapping_table.end())
