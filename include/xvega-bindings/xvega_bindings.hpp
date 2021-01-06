@@ -35,13 +35,6 @@ namespace nl = nlohmann;
 
 namespace xv_bindings
 {
-    std::string demangle(const char* mangled)
-    {
-          int status;
-          std::unique_ptr<char[], void (*)(void*)> result(
-            __cxxabiv1::__cxa_demangle(mangled, 0, 0, &status), std::free);
-          return result.get() ? std::string(result.get()) : "error occurred";
-    }
     /**
         Base parser class, should be inherited to define concrete parsers. This class
         contains helpers to call appropriate parsing functions based on a parsing map,
@@ -220,20 +213,20 @@ namespace xv_bindings
         {
             return {
                 std::type_index(typeid(U)),
-                [=](xtl::any const &a)
+                [=](xtl::any const &any_type)
                 {
-                    f(xtl::any_cast<U const&>(a));
+                    f(xtl::any_cast<U const&>(any_type));
                 }
             };
         }
 
-        inline void visit_any(const xtl::any& a, const visitor_map_type& any_visitor)
+        inline void visit_any(const xtl::any& any_type, const visitor_map_type& any_visitor)
         {
-            if (const auto it = any_visitor.find(std::type_index(a.type()));
+            if (const auto it = any_visitor.find(std::type_index(any_type.type()));
                 it != any_visitor.cend()) {
-                it->second(a);
+                it->second(any_type);
             } else {
-                std::cout << "Unregistered type "<< std::quoted(demangle(a.type().name()));
+                std::cout << "Unregistered type "<< any_type.type().name();
             }
         }
 
