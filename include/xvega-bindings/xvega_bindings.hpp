@@ -24,8 +24,6 @@
 #include <vector>
 #include <utility>
 
-#include <cxxabi.h>
-
 #include "nlohmann/json.hpp"
 #include "xvega/xvega.hpp"
 
