@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 
-project(xvega-bindings VERSION 0.0.5 LANGUAGES CXX)
+project(xvega-bindings VERSION 0.0.6 LANGUAGES CXX)
 
 include(GNUInstallDirs)
 
