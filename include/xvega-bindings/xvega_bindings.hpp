@@ -220,8 +220,8 @@ namespace xv_bindings
 
         inline void visit_any(const xtl::any& any_type, const visitor_map_type& any_visitor)
         {
-            if (const auto it = any_visitor.find(std::type_index(any_type.type()));
-                it != any_visitor.cend()) {
+            const auto it = any_visitor.find(std::type_index(any_type.type()));
+            if (it != any_visitor.cend()) {
                 it->second(any_type);
             } else {
                 std::cout << "Unregistered type "<< any_type.type().name();
