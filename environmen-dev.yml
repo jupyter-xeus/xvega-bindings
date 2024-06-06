@@ -1,0 +1,13 @@
+name: xvega
+channels:
+  - conda-forge
+dependencies:
+# build dependencies
+  - cmake
+  - cxx-compiler
+  - ninja
+# host Dependencies
+  - xvega=0.0.10
+# Test dependencies
+  - doctest
+
