@@ -43,7 +43,7 @@ jobs:
           cmake .. \
             -D CMAKE_PREFIX_PATH=$CONDA_PREFIX \
             -D CMAKE_INSTALL_PREFIX=$CONDA_PREFIX \
-            -D XVEHA_BUILD_TESTS=ON
+            -D XVEGA_BUILD_TESTS=ON
         working-directory: build
 
       - name: Build
