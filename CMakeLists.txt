@@ -29,6 +29,18 @@ message(STATUS "xvega-bindings v${${PROJECT_NAME}_VERSION}")
 
 find_package(xvega REQUIRED)
 
+# nlohmann_json requires libraries that exchange json objects to be linked
+# with the same version of nlohmann_json. Therefore this version should be
+# the same in all xeus components; to do so, downstream projects should not
+# search # directly for nlohmann_json, but rely on find_dependency called by
+# find_package(xeus) instead.
+set(nlohmann_json_REQUIRED_VERSION 3.11)
+
+if (NOT TARGET nlohmann_json)
+    find_package(nlohmann_json ${nlohmann_json_REQUIRED_VERSION} REQUIRED)
+    message(STATUS "Found nlohmann_json ${nlohmann_json_VERSION}")
+endif ()
+
 # Build
 # =====
 

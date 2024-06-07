@@ -34,6 +34,7 @@ find_package(doctest REQUIRED)
 
 set(XVEGA_BINDINGS_TESTS
     main.cpp
+    test_bindings.cpp
 )
 
 add_executable(test_xvega_bindings ${XVEGA_BINDINGS_TESTS} ${XVEGA_BINDINGS_HEADERS})
