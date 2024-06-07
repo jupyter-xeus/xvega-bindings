@@ -35,7 +35,7 @@ find_package(xvega REQUIRED)
 set(XVEGA_BINDINGS_HEADERS
     ${XVEGA_BINDINGS_INCLUDE_DIR}/xvega-bindings/utils.hpp
     ${XVEGA_BINDINGS_INCLUDE_DIR}/xvega-bindings/xvega_bindings.hpp
-    ${XVEGA_BINDINGS_INCLUDE_DIR}/xvega-bindings/xvega_bindigs_config.hpp
+    ${XVEGA_BINDINGS_INCLUDE_DIR}/xvega-bindings/xvega_bindings_config.hpp
 )
 
 add_library(xvega-bindings INTERFACE)
