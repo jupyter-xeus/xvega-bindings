@@ -8,6 +8,8 @@ dependencies:
   - ninja
 # host Dependencies
   - xvega=0.1.0
+#TODO: remove this when the xvega feedstock is fixed
+  - xproperty=0.12.0
   - nlohmann_json=3.11.3
 # Test dependencies
   - doctest
