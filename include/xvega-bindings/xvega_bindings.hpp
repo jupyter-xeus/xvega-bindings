@@ -21,6 +21,7 @@
 #include <typeindex>
 #include <typeinfo>
 #include <unordered_map>
+#include <variant>
 #include <vector>
 #include <utility>
 
@@ -94,7 +95,7 @@ namespace xv_bindings
         using range_it_fun = std::function<input_it(T*,
                                                     const input_it&,
                                                     const input_it&)>;
-        using parse_function_types = xtl::variant<point_it_fun,
+        using parse_function_types = std::variant<point_it_fun,
                                                   range_it_fun>;
 
         struct command_info {
@@ -164,13 +165,13 @@ namespace xv_bindings
             if (cmd_info.parse_function.index() == 0)
             {
                 /** Calls command functions that receive a point iterator **/
-                xtl::get<0>(cmd_info.parse_function)(static_cast<T*>(this), it);
+                std::get<0>(cmd_info.parse_function)(static_cast<T*>(this), it);
                 it++;
             }
             else if (cmd_info.parse_function.index() == 1)
             {
                 /** Calls command functions that receive a range iterator **/
-                it = xtl::get<1>(cmd_info.parse_function)(static_cast<T*>(this),
+                it = std::get<1>(cmd_info.parse_function)(static_cast<T*>(this),
                                                           it,
                                                           end);
             }
@@ -202,23 +203,23 @@ namespace xv_bindings
             return it;
         }
 
-        /* Implementation of a visitor for xv::xany which is a xtl::any */
-        using visitor_map_type = std::unordered_map<std::type_index, std::function<void(xtl::any const&)>>;
+        /* Implementation of a visitor for xv::xany which is a std::any */
+        using visitor_map_type = std::unordered_map<std::type_index, std::function<void(std::any const&)>>;
 
         template<typename U, typename F>
-        inline std::pair<const std::type_index, std::function<void(xtl::any const&)> >
+        inline std::pair<const std::type_index, std::function<void(std::any const&)> >
             to_any_visitor(F const &f)
         {
             return {
                 std::type_index(typeid(U)),
-                [=](xtl::any const &any_type)
+                [=](std::any const &any_type)
                 {
-                    f(xtl::any_cast<U const&>(any_type));
+                    f(std::any_cast<U const&>(any_type));
                 }
             };
         }
 
-        inline void visit_any(const xtl::any& any_type, const visitor_map_type& any_visitor)
+        inline void visit_any(const std::any& any_type, const visitor_map_type& any_visitor)
         {
             const auto it = any_visitor.find(std::type_index(any_type.type()));
             if (it != any_visitor.cend()) {
@@ -316,7 +317,7 @@ namespace xv_bindings
 
     struct field_parser : parser_base<field_parser>
     {
-        using xy_variant = xtl::variant<xv::X*, xv::Y*>;
+        using xy_variant = std::variant<xv::X*, xv::Y*>;
         xy_variant enc;
 
         field_parser(xy_variant enc) : enc(enc)
@@ -331,7 +332,7 @@ namespace xv_bindings
 
         input_it parse_init(const input_it& begin, const input_it&)
         {
-            xtl::visit([&](auto &&x_or_y)
+            std::visit([&](auto &&x_or_y)
             {
                 x_or_y->field = *begin;
                 x_or_y->type = "quantitative";
@@ -342,7 +343,7 @@ namespace xv_bindings
 
         input_it parse_field_bin(const input_it& begin, const input_it& end)
         {
-            bool found = xtl::visit([&](auto &&x_or_y)
+            bool found = std::visit([&](auto &&x_or_y)
             {
                 return simple_switch(*begin,
                 {
@@ -366,7 +367,7 @@ namespace xv_bindings
                     throw std::runtime_error("Missing or invalid BIN type");
                 }
 
-                xtl::visit([&](auto &&x_or_y)
+                std::visit([&](auto &&x_or_y)
                 {
                     x_or_y->bin().value() = bin;
                 }, enc);
@@ -378,7 +379,7 @@ namespace xv_bindings
 
         void parse_field_type(const input_it& it)
         {
-            bool found = xtl::visit([&](auto &&x_or_y)
+            bool found = std::visit([&](auto &&x_or_y)
             {
                 return simple_switch(*it,
                 {
@@ -396,7 +397,7 @@ namespace xv_bindings
 
         input_it parse_field_aggregate(const input_it& begin, const input_it&)
         {
-            bool found = xtl::visit([&](auto &&x_or_y)
+            bool found = std::visit([&](auto &&x_or_y)
             {
                 return simple_switch(*begin,
                 {
@@ -434,7 +435,7 @@ namespace xv_bindings
 
         void parse_field_time_unit(const input_it& it)
         {
-            bool found = xtl::visit([&](auto &&x_or_y)
+            bool found = std::visit([&](auto &&x_or_y)
             {
                 return simple_switch(*it,
                 {
@@ -493,17 +494,17 @@ namespace xv_bindings
         void parse_color(const input_it& it)
         {
             visitor_map_type any_visitor {
-                to_any_visitor<xtl::xclosure_wrapper<xv::mark_arc&>>    ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
-                to_any_visitor<xtl::xclosure_wrapper<xv::mark_area&>>   ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
-                to_any_visitor<xtl::xclosure_wrapper<xv::mark_bar&>>    ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
-                to_any_visitor<xtl::xclosure_wrapper<xv::mark_circle&>> ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
-                to_any_visitor<xtl::xclosure_wrapper<xv::mark_line&>>   ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
-                to_any_visitor<xtl::xclosure_wrapper<xv::mark_point&>>  ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
-                to_any_visitor<xtl::xclosure_wrapper<xv::mark_rect&>>   ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
-                to_any_visitor<xtl::xclosure_wrapper<xv::mark_rule&>>   ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
-                to_any_visitor<xtl::xclosure_wrapper<xv::mark_square&>> ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
-                to_any_visitor<xtl::xclosure_wrapper<xv::mark_tick&>>   ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
-                to_any_visitor<xtl::xclosure_wrapper<xv::mark_trail&>>  ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
+                to_any_visitor<std::reference_wrapper<xv::mark_arc>>    ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
+                to_any_visitor<std::reference_wrapper<xv::mark_area>>   ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
+                to_any_visitor<std::reference_wrapper<xv::mark_bar>>    ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
+                to_any_visitor<std::reference_wrapper<xv::mark_circle>> ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
+                to_any_visitor<std::reference_wrapper<xv::mark_line>>   ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
+                to_any_visitor<std::reference_wrapper<xv::mark_point>>  ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
+                to_any_visitor<std::reference_wrapper<xv::mark_rect>>   ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
+                to_any_visitor<std::reference_wrapper<xv::mark_rule>>   ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
+                to_any_visitor<std::reference_wrapper<xv::mark_square>> ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
+                to_any_visitor<std::reference_wrapper<xv::mark_tick>>   ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
+                to_any_visitor<std::reference_wrapper<xv::mark_trail>>  ([&](auto mark_generic) { mark_generic.get().color = to_lower(*it); }),
             };
 
             visit_any(this->chart.mark().value(), any_visitor);
