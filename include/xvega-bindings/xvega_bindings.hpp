@@ -264,13 +264,13 @@ namespace xv_bindings
 
         void parse_bin_anchor(const input_it& it)
         {
-            bin.anchor().value() = std::stod(*it);
+            bin.anchor() = std::stod(*it);
             num_parsed_attrs++;
         }
 
         void parse_bin_base(const input_it& it)
         {
-            bin.base().value() = std::stod(*it);
+            bin.base() = std::stod(*it);
             num_parsed_attrs++;
         }
 
@@ -278,22 +278,22 @@ namespace xv_bindings
         {
             simple_switch(*it,
             {
-                {"TRUE",  [&]{ bin.binned().value() = true;
+                {"TRUE",  [&]{ bin.binned() = true;
                     num_parsed_attrs++; }},
-                {"FALSE", [&]{ bin.binned().value() = false;
+                {"FALSE", [&]{ bin.binned() = false;
                     num_parsed_attrs++; }},
             });
         }
 
         void parse_bin_maxbins(const input_it& it)
         {
-            bin.maxbins().value() = std::stod(*it);
+            bin.maxbins() = std::stod(*it);
             num_parsed_attrs++;
         }
 
         void parse_bin_minstep(const input_it& it)
         {
-            bin.minstep().value() = std::stod(*it);
+            bin.minstep() = std::stod(*it);
             num_parsed_attrs++;
         }
 
@@ -301,16 +301,16 @@ namespace xv_bindings
         {
             simple_switch(*it,
             {
-                {"TRUE",  [&]{ bin.nice().value() = true;
+                {"TRUE",  [&]{ bin.nice() = true;
                     num_parsed_attrs++; }},
-                {"FALSE", [&]{ bin.nice().value() = false;
+                {"FALSE", [&]{ bin.nice() = false;
                     num_parsed_attrs++; }},
             });
         }
 
         void parse_bin_step(const input_it& it)
         {
-            bin.step().value() = std::stod(*it);
+            bin.step() = std::stod(*it);
             num_parsed_attrs++;
         }
     };
@@ -347,8 +347,8 @@ namespace xv_bindings
             {
                 return simple_switch(*begin,
                 {
-                    {"TRUE",  [&]{ x_or_y->bin().value() = true;  }},
-                    {"FALSE", [&]{ x_or_y->bin().value() = false; }},
+                    {"TRUE",  [&]{ x_or_y->bin() = true;  }},
+                    {"FALSE", [&]{ x_or_y->bin() = false; }},
                 });
             }, enc);
 
@@ -369,7 +369,7 @@ namespace xv_bindings
 
                 std::visit([&](auto &&x_or_y)
                 {
-                    x_or_y->bin().value() = bin;
+                    x_or_y->bin() = bin;
                 }, enc);
 
                 return it;
@@ -383,10 +383,10 @@ namespace xv_bindings
             {
                 return simple_switch(*it,
                 {
-                    {"QUANTITATIVE", [&]{ x_or_y->type().value() = "quantitative"; }},
-                    {"NOMINAL",      [&]{ x_or_y->type().value() = "nominal";      }},
-                    {"ORDINAL",      [&]{ x_or_y->type().value() = "ordinal";      }},
-                    {"TEMPORAL",     [&]{ x_or_y->type().value() = "temporal";     }},
+                    {"QUANTITATIVE", [&]{ x_or_y->type() = "quantitative"; }},
+                    {"NOMINAL",      [&]{ x_or_y->type() = "nominal";      }},
+                    {"ORDINAL",      [&]{ x_or_y->type() = "ordinal";      }},
+                    {"TEMPORAL",     [&]{ x_or_y->type() = "temporal";     }},
                 });
             }, enc);
             if (!found)
@@ -401,28 +401,28 @@ namespace xv_bindings
             {
                 return simple_switch(*begin,
                 {
-                    {"COUNT",     [&]{ x_or_y->aggregate().value() = "count";     }},
-                    {"VALID",     [&]{ x_or_y->aggregate().value() = "valid";     }},
-                    {"MISSING",   [&]{ x_or_y->aggregate().value() = "missing";   }},
-                    {"DISTINCT",  [&]{ x_or_y->aggregate().value() = "distinct";  }},
-                    {"SUM",       [&]{ x_or_y->aggregate().value() = "sum";       }},
-                    {"PRODUCT",   [&]{ x_or_y->aggregate().value() = "product";   }},
-                    {"MEAN",      [&]{ x_or_y->aggregate().value() = "mean";      }},
-                    {"AVERAGE",   [&]{ x_or_y->aggregate().value() = "average";   }},
-                    {"VARIANCE",  [&]{ x_or_y->aggregate().value() = "variance";  }},
-                    {"VARIANCEP", [&]{ x_or_y->aggregate().value() = "variancep"; }},
-                    {"STDEV",     [&]{ x_or_y->aggregate().value() = "stdev";     }},
-                    {"STEDEVP",   [&]{ x_or_y->aggregate().value() = "stedevp";   }},
-                    {"STEDERR",   [&]{ x_or_y->aggregate().value() = "stederr";   }},
-                    {"MEDIAN",    [&]{ x_or_y->aggregate().value() = "median";    }},
-                    {"Q1",        [&]{ x_or_y->aggregate().value() = "q1";        }},
-                    {"Q3",        [&]{ x_or_y->aggregate().value() = "q3";        }},
-                    {"CI0",       [&]{ x_or_y->aggregate().value() = "ci0";       }},
-                    {"CI1",       [&]{ x_or_y->aggregate().value() = "ci1";       }},
-                    {"MIN",       [&]{ x_or_y->aggregate().value() = "min";       }},
-                    {"MAX",       [&]{ x_or_y->aggregate().value() = "max";       }},
-                    {"ARGMIN",    [&]{ x_or_y->aggregate().value() = "argmin";    }},
-                    {"ARGMAX",    [&]{ x_or_y->aggregate().value() = "argmax";    }},
+                    {"COUNT",     [&]{ x_or_y->aggregate() = "count";     }},
+                    {"VALID",     [&]{ x_or_y->aggregate() = "valid";     }},
+                    {"MISSING",   [&]{ x_or_y->aggregate() = "missing";   }},
+                    {"DISTINCT",  [&]{ x_or_y->aggregate() = "distinct";  }},
+                    {"SUM",       [&]{ x_or_y->aggregate() = "sum";       }},
+                    {"PRODUCT",   [&]{ x_or_y->aggregate() = "product";   }},
+                    {"MEAN",      [&]{ x_or_y->aggregate() = "mean";      }},
+                    {"AVERAGE",   [&]{ x_or_y->aggregate() = "average";   }},
+                    {"VARIANCE",  [&]{ x_or_y->aggregate() = "variance";  }},
+                    {"VARIANCEP", [&]{ x_or_y->aggregate() = "variancep"; }},
+                    {"STDEV",     [&]{ x_or_y->aggregate() = "stdev";     }},
+                    {"STEDEVP",   [&]{ x_or_y->aggregate() = "stedevp";   }},
+                    {"STEDERR",   [&]{ x_or_y->aggregate() = "stederr";   }},
+                    {"MEDIAN",    [&]{ x_or_y->aggregate() = "median";    }},
+                    {"Q1",        [&]{ x_or_y->aggregate() = "q1";        }},
+                    {"Q3",        [&]{ x_or_y->aggregate() = "q3";        }},
+                    {"CI0",       [&]{ x_or_y->aggregate() = "ci0";       }},
+                    {"CI1",       [&]{ x_or_y->aggregate() = "ci1";       }},
+                    {"MIN",       [&]{ x_or_y->aggregate() = "min";       }},
+                    {"MAX",       [&]{ x_or_y->aggregate() = "max";       }},
+                    {"ARGMIN",    [&]{ x_or_y->aggregate() = "argmin";    }},
+                    {"ARGMAX",    [&]{ x_or_y->aggregate() = "argmax";    }},
                     //TODO: missing values arg
                 });
             }, enc);
@@ -439,15 +439,15 @@ namespace xv_bindings
             {
                 return simple_switch(*it,
                 {
-                    {"YEAR",        [&]{ x_or_y->timeUnit().value() = "year";        }},
-                    {"QUARTER",     [&]{ x_or_y->timeUnit().value() = "quarter";     }},
-                    {"MONTH",       [&]{ x_or_y->timeUnit().value() = "month";       }},
-                    {"DAY",         [&]{ x_or_y->timeUnit().value() = "day";         }},
-                    {"DATE",        [&]{ x_or_y->timeUnit().value() = "date";        }},
-                    {"HOURS",       [&]{ x_or_y->timeUnit().value() = "hours";       }},
-                    {"MINUTES",     [&]{ x_or_y->timeUnit().value() = "minutes";     }},
-                    {"SECONDS",     [&]{ x_or_y->timeUnit().value() = "seconds";     }},
-                    {"MILISECONDS", [&]{ x_or_y->timeUnit().value() = "miliseconds"; }},
+                    {"YEAR",        [&]{ x_or_y->timeUnit() = "year";        }},
+                    {"QUARTER",     [&]{ x_or_y->timeUnit() = "quarter";     }},
+                    {"MONTH",       [&]{ x_or_y->timeUnit() = "month";       }},
+                    {"DAY",         [&]{ x_or_y->timeUnit() = "day";         }},
+                    {"DATE",        [&]{ x_or_y->timeUnit() = "date";        }},
+                    {"HOURS",       [&]{ x_or_y->timeUnit() = "hours";       }},
+                    {"MINUTES",     [&]{ x_or_y->timeUnit() = "minutes";     }},
+                    {"SECONDS",     [&]{ x_or_y->timeUnit() = "seconds";     }},
+                    {"MILISECONDS", [&]{ x_or_y->timeUnit() = "miliseconds"; }},
                 });
             }, enc);
             if (!found)
