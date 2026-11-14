@@ -530,9 +530,11 @@ namespace xv_bindings
 
         input_it parse_init(const input_it& begin, const input_it&)
         {
-            auto ac = xv::axis_config().grid(true);
-            auto cf = xv::Config().axis(ac);
-            this->chart.config() = cf;
+            xv::axis_config ac;
+            ac.grid = true;
+            xv::Config cf;
+            cf.axis = ac;
+            this->chart.config = cf;
             return begin;
         }
 

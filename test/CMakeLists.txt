@@ -40,7 +40,7 @@ set(XVEGA_BINDINGS_TESTS
 add_executable(test_xvega_bindings ${XVEGA_BINDINGS_TESTS} ${XVEGA_BINDINGS_HEADERS})
 target_compile_features(test_xvega_bindings PRIVATE cxx_std_17)
 target_include_directories(test_xvega_bindings PRIVATE ${XVEGA_BINDINGS_INCLUDE_DIR})
-target_link_libraries(test_xvega_bindings PRIVATE doctest::doctest Threads::Threads)
+target_link_libraries(test_xvega_bindings PRIVATE xvega-bindings doctest::doctest Threads::Threads)
 
 add_custom_target(xtest COMMAND test_xvega_bindings DEPENDS test_xvega_bindings)
 

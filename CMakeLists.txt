@@ -27,7 +27,8 @@ message(STATUS "xvega-bindings v${${PROJECT_NAME}_VERSION}")
 # Dependencies
 # ============
 
-find_package(xvega REQUIRED)
+set(xvega_REQUIRED_VERSION 0.2.0)
+find_package(xvega ${xvega_REQUIRED_VERSION} REQUIRED)
 
 # nlohmann_json requires libraries that exchange json objects to be linked
 # with the same version of nlohmann_json. Therefore this version should be
