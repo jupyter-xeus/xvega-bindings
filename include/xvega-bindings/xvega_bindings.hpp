@@ -17,6 +17,7 @@
 #include <iostream>
 #include <iterator>
 #include <map>
+#include <memory>
 #include <type_traits>
 #include <typeindex>
 #include <typeinfo>
@@ -530,11 +531,10 @@ namespace xv_bindings
 
         input_it parse_init(const input_it& begin, const input_it&)
         {
-            xv::axis_config ac;
-            ac.grid = true;
-            xv::Config cf;
-            cf.axis = ac;
-            this->chart.config = cf;
+            // xvega objects are very large (xv::Config is several hundred KB);
+            // build them in place to avoid stack overflows on platforms with
+            // a small default stack (e.g. 1MB on Windows).
+            this->chart.config().emplace().axis().emplace().grid() = true;
             return begin;
         }
 
@@ -550,19 +550,13 @@ namespace xv_bindings
 
         input_it parse_x_field(const input_it& begin, const input_it& end)
         {
-            xv::X x_enc = xv::X();
-            this->chart.encoding().value().x = x_enc;
-
-            field_parser parser(&this->chart.encoding().value().x().value());
+            field_parser parser(&this->chart.encoding().value().x().emplace());
             return parser.parse_loop(begin, end);
         }
 
         input_it parse_y_field(const input_it& begin, const input_it& end)
         {
-            xv::Y y_enc = xv::Y();
-            this->chart.encoding().value().y = y_enc;
-
-            field_parser parser(&this->chart.encoding().value().y().value());
+            field_parser parser(&this->chart.encoding().value().y().emplace());
             return parser.parse_loop(begin, end);
         }
 
@@ -598,8 +592,12 @@ namespace xv_bindings
                                                xv::df_type xv_sqlite_df)
     {
         /** Initializes and populates xeus_sqlite object **/
-        xv::Chart chart;
-        chart.encoding() = xv::Encodings();
+        // xv::Chart is several hundred KB: allocate it on the heap to avoid
+        // stack overflows on platforms with a small default stack (e.g. 1MB
+        // on Windows).
+        auto chart_ptr = std::make_unique<xv::Chart>();
+        xv::Chart& chart = *chart_ptr;
+        chart.encoding().emplace();
 
         /** Populates chart with data gathered on interpreter::process_SQLite_input **/
         xv::data_frame data_frame;
